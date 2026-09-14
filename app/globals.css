@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* Design tokens are the exact hex values from PRD §4.1. There is one fixed
+   light palette — no dark variants, by design. */
+@theme {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Surfaces */
+  --color-canvas: #f4f4f1;
+  --color-surface: #ffffff;
+  --color-subtle: #fcfcfa;
+  --color-subtle-2: #fbfbf9;
+  --color-neutral-strip: #faf9f6;
+  --color-disabled-fill: #f4f4f1;
+  --color-btn-disabled: #f1f1ec;
+  --color-skeleton: #f7f7f4;
+  --color-skeleton-bar: #e6e6e0;
+  --color-skeleton-bar-2: #ececE6;
+
+  /* Ink */
+  /* The two muted inks are darkened from the values in PRD §4.1 (#7a7c76 /
+     #8a8c85), which measured 4.22:1 and 3.40:1 on white — below the 4.5:1 WCAG
+     AA floor for text under 18px. ink-disabled stays as specified: disabled
+     text is exempt, and darkening it would read as enabled. */
+  --color-ink: #1b1c1a;
+  --color-ink-body: #4d4f4a;
+  --color-ink-body-2: #5a5c56;
+  --color-ink-muted: #6a6c66;
+  --color-ink-muted-2: #71736d;
+  --color-ink-muted-3: #73756e;
+  --color-ink-disabled: #a3a59e;
+
+  /* Borders */
+  --color-border-strong: #d9d9d4;
+  --color-line: #e2e2dc;
+  --color-line-light: #e6e6e1;
+  --color-line-lighter: #ececE6;
+  --color-line-dashed: #cfcfc8;
+
+  /* Green — the single accent */
+  --color-accent: #2f6b45;
+  --color-accent-hover: #255637;
+  --color-link-hover: #1f4a2f;
+  --color-green-border: #bcd3c3;
+  --color-green-tint: #f2f7f3;
+  --color-green-tint-border: #dfe9e2;
+  --color-green-tint-ink: #3c4a41;
+  --color-green-divider: #e6efe9;
+  --color-selected-fill: #fcfdfc;
+  --color-strip-sep: #c9d6cd;
+
+  /* Informational chips — never accents */
+  --color-container-ink: #4a5c8a;
+  --color-container-border: #ccd4e6;
+  --color-container-fill: #f4f6fb;
+  --color-caution-ink: #8a6a2f;
+  --color-caution-border: #e6dcc2;
+  --color-caution-fill: #faf6ec;
+
+  /* Error */
+  --color-error-ink: #8a3b2f;
+  --color-error-heading: #7a3227;
+  --color-error-border: #e6cfc9;
+  --color-error-fill: #fdf6f4;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* Disabled placeholder rows on the empty crops list (PRD §4.1). */
+.hatch {
+  background: repeating-linear-gradient(135deg, #fafaf7 0 8px, #f4f4f0 8px 16px);
+}
+
+input,
+select,
+button {
+  font-family: inherit;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-accent);
+}
+
+/* iOS zooms any focused input under 16px. */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}

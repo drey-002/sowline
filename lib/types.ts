@@ -81,6 +81,8 @@ export interface PlanCrop {
   customName: string | null;
   customDaysToMaturity: number | null;
   customSowMethod: SowMethod | null;
+  /** Generated "Why:" line for a custom crop. Null until (or unless) it lands. */
+  customWhy: string | null;
   quantity: number | null;
   selected: boolean;
   addedAt: string;

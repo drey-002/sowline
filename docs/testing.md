@@ -101,3 +101,19 @@ If you'd rather work on these in a separate Claude session, paste this:
 Read the diff Vitest prints — it shows expected vs actual. Then ask which is wrong:
 the code, or the test's expectation. Both happen. If a test fails because the intended
 behaviour genuinely changed, update the test and say so in the commit message.
+
+---
+
+## Added in Phase 4
+
+`tests/store.test.ts` covers zip validation and schema migration. The migration
+tests are worth reading as a pattern: `migrate()` takes a plain object and returns
+one, so it needs no browser at all despite being the code that guards localStorage.
+That's not an accident — it was written that way *so* it could be tested.
+
+Note the two tests asserting migration **refuses** rather than succeeds (future
+version, no migration path). Refusing is the feature: an older build must never
+overwrite newer data. A test that only checked the happy path would let that
+regress silently.
+
+Gap 5 from the list above is now done. Gaps 1-4 are still open.

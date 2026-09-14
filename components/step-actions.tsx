@@ -10,14 +10,16 @@ export function StepActions({
   backLabel,
   continueHref,
   continueLabel,
+  className = "",
 }: {
   backHref: string;
   backLabel: string;
   continueHref?: string;
   continueLabel?: string;
+  className?: string;
 }) {
   return (
-    <div className="mt-6 flex flex-col gap-3 md:flex-row">
+    <div className={`mt-6 flex flex-col gap-3 md:flex-row ${className}`}>
       <ButtonLink href={backHref} variant="secondary" className="w-full md:w-auto">
         ← {backLabel}
       </ButtonLink>

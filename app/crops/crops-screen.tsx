@@ -38,6 +38,7 @@ export default function CropsScreen() {
     setQuantity,
     removeCrop,
     addCustomCrop,
+    generatingWhy,
     toggleCropFor,
     setQuantityFor,
   } = usePlan();
@@ -106,6 +107,7 @@ export default function CropsScreen() {
           customName: null,
           customDaysToMaturity: null,
           customSowMethod: null,
+          customWhy: null,
           quantity: null,
           selected: false,
           addedAt: "",
@@ -194,6 +196,7 @@ export default function CropsScreen() {
                       location={location}
                       isTopRanked={crop?.id === topRankedId}
                       showWhy={showWhy}
+                      generatingWhy={generatingWhy.has(planCrop.id)}
                       onToggle={() =>
                         crop ? toggleCropFor(crop.id) : toggleCrop(planCrop.id)
                       }

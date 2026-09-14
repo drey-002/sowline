@@ -3,7 +3,7 @@
 import type { AppState } from "./types";
 
 const ROOT_KEY = "sowline.v1";
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 export function emptyState(): AppState {
   return {
@@ -40,7 +40,19 @@ function canUseStorage(): boolean {
  *     1: (s) => ({ ...s, version: 2, plan: s.plan && { ...s.plan, beds: [] } }),
  *   };
  */
-const MIGRATIONS: Record<number, (state: Record<string, unknown>) => Record<string, unknown>> = {};
+const MIGRATIONS: Record<number, (state: Record<string, unknown>) => Record<string, unknown>> = {
+  // v2 added PlanCrop.customWhy, the generated why-line for custom crops.
+  1: (state) => {
+    const plan = state.plan as { crops?: Record<string, unknown>[] } | null;
+    return {
+      ...state,
+      version: 2,
+      plan: plan
+        ? { ...plan, crops: (plan.crops ?? []).map((c) => ({ customWhy: null, ...c })) }
+        : null,
+    };
+  },
+};
 
 /** Why the last load could not use the stored data, for the UI to surface. */
 export type LoadIssue =

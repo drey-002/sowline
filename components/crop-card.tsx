@@ -28,6 +28,7 @@ export function CropCard({
   location,
   isTopRanked,
   showWhy,
+  generatingWhy = false,
   onToggle,
   onQuantity,
 }: {
@@ -36,6 +37,7 @@ export function CropCard({
   location: Location | null;
   isTopRanked: boolean;
   showWhy: boolean;
+  generatingWhy?: boolean;
   onToggle: () => void;
   onQuantity: (value: number | null) => void;
 }) {
@@ -95,6 +97,16 @@ export function CropCard({
           {showWhy && crop && (
             <p className="mt-[6px] text-[12px] text-ink-muted md:text-[13px]">
               Why: {crop.whyStrategic}
+            </p>
+          )}
+          {/* A custom crop's why-line is generated, so it can be pending or
+              simply absent — plain text, no spinner (PRD §5 Phase 4). */}
+          {showWhy && !crop && generatingWhy && (
+            <p className="mt-[6px] text-[12px] text-ink-muted-3 md:text-[13px]">Generating…</p>
+          )}
+          {showWhy && !crop && !generatingWhy && planCrop.customWhy && (
+            <p className="mt-[6px] text-[12px] text-ink-muted md:text-[13px]">
+              Why: {planCrop.customWhy}
             </p>
           )}
         </div>

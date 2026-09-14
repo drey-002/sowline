@@ -25,22 +25,69 @@ export function isWellFormedZip(zip: string): boolean {
   return /^\d{5}$/.test(zip);
 }
 
+/** Bundled-only resolution, used when the API route cannot be reached at all. */
+function fromBundled(zip: string): Location {
+  const record = ZONES_BY_PREFIX[zip.slice(0, 3)];
+  if (!record) throw new ZipNotFoundError(zip);
+  return buildLocation(zip, record.city, record.zone, record.lastFrost, record.firstFrost);
+}
+
+function buildLocation(
+  zip: string,
+  city: string,
+  zone: string,
+  lastFrost: string,
+  firstFrost: string,
+): Location {
+  const year = planYearFor(lastFrost);
+  return {
+    zipCode: zip,
+    city,
+    hardinessZone: zone,
+    lastFrostAvg: `${year}-${lastFrost}`,
+    lastFrostOverride: null,
+    firstFrostAvg: `${year}-${firstFrost}`,
+    resolvedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * Resolve a zip through the API route, which tries the live service and falls
+ * back to the bundled dataset server-side. If the route itself is unreachable
+ * we fall back again in the browser, so a lookup still works fully offline.
+ *
+ * Frost dates always come from the zone: there is no free frost-date service,
+ * so the live lookup contributes the zone and city only.
+ */
 export async function resolveZip(zip: string): Promise<Location> {
   await simulatedDelay();
 
-  const record = ZONES_BY_PREFIX[zip.slice(0, 3)];
-  if (!record) throw new ZipNotFoundError(zip);
+  try {
+    const res = await fetch(`/api/zone?zip=${encodeURIComponent(zip)}`, {
+      signal: AbortSignal.timeout(6000),
+    });
+    if (res.status === 404) throw new ZipNotFoundError(zip);
+    if (!res.ok) return fromBundled(zip);
 
-  const year = planYearFor(record.lastFrost);
-  return {
-    zipCode: zip,
-    city: record.city,
-    hardinessZone: record.zone,
-    lastFrostAvg: `${year}-${record.lastFrost}`,
-    lastFrostOverride: null,
-    firstFrostAvg: `${year}-${record.firstFrost}`,
-    resolvedAt: new Date().toISOString(),
-  };
+    const body = (await res.json()) as { city: string; hardinessZone: string };
+    const frost = ZONE_DEFAULTS[body.hardinessZone];
+    if (!frost) return fromBundled(zip);
+
+    // A zip in the bundled table keeps its local frost dates, which are more
+    // specific than the zone-wide averages.
+    const bundled = ZONES_BY_PREFIX[zip.slice(0, 3)];
+    const useLocal = bundled?.zone === body.hardinessZone;
+    return buildLocation(
+      zip,
+      body.city,
+      body.hardinessZone,
+      useLocal ? bundled.lastFrost : frost.lastFrost,
+      useLocal ? bundled.firstFrost : frost.firstFrost,
+    );
+  } catch (error) {
+    if (error instanceof ZipNotFoundError) throw error;
+    return fromBundled(zip);
+  }
 }
 
 /**

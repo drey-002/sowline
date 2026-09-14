@@ -97,3 +97,37 @@ input[type="radio"] {
     font-size: 16px;
   }
 }
+
+/* Print: the planting plan is the one page worth taking outside, so it drops
+   every piece of navigation chrome and prints as a plain specification list
+   (PRD §5 Phase 4 — browser print, no PDF library). */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  /* The app frame's border, radius and overflow clipping all fight pagination. */
+  .print-frame {
+    max-width: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-card {
+    border: 1px solid #d9d9d4 !important;
+    /* Keep a crop's specs from splitting across a page break. */
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  a[href]::after {
+    content: "";
+  }
+}

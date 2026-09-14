@@ -47,6 +47,8 @@ interface PlanContextValue {
   setQuantity: (planCropId: string, quantity: number | null) => void;
   removeCrop: (planCropId: string) => void;
   addCustomCrop: (input: { name: string; daysToMaturity: number | null; sowMethod: PlanCrop["customSowMethod"] }) => void;
+  /** Plan crops with a why-line generation in flight. */
+  generatingWhy: ReadonlySet<string>;
   addCatalogCrop: (cropId: string) => void;
   setPrefs: (patch: Partial<Prefs>) => void;
   addLogEntry: (entry: Omit<LogEntry, "id" | "createdAt">) => void;
@@ -78,6 +80,9 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   // Transient, never persisted: set when a zip resolves so screen 2 shows its
   // loading state once, on arrival, rather than on every visit.
   const [pendingRecommendations, setPendingRecommendations] = useState(false);
+
+  // Custom crops whose why-line is still being generated.
+  const [generating, setGenerating] = useState<ReadonlySet<string>>(() => new Set());
 
   useEffect(() => {
     if (hydrated) saveState(clientState);
@@ -164,6 +169,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
               customName: null,
               customDaysToMaturity: null,
               customSowMethod: null,
+          customWhy: null,
               quantity: null,
               selected: true,
               addedAt: new Date().toISOString(),
@@ -195,21 +201,52 @@ export function PlanProvider({ children }: { children: ReactNode }) {
           list.map((c) => (c.id === planCropId ? { ...c, selected: false } : c)),
         ),
 
-      addCustomCrop: ({ name, daysToMaturity, sowMethod }) =>
+      addCustomCrop: ({ name, daysToMaturity, sowMethod }) => {
+        const id = newId();
         mutateCrops((list) => [
           ...list,
           {
-            id: newId(),
+            id,
             cropId: null,
             isCustom: true,
             customName: name,
             customDaysToMaturity: daysToMaturity,
             customSowMethod: sowMethod,
+            customWhy: null,
             quantity: null,
             selected: true,
             addedAt: new Date().toISOString(),
           },
-        ]),
+        ]);
+
+        // Additive and skippable: the crop is already usable, so a failure
+        // here just means the card carries no why-line (PRD §5 Phase 4).
+        setGenerating((prev) => new Set(prev).add(id));
+        void (async () => {
+          let why: string | null = null;
+          try {
+            const res = await fetch("/api/enrich", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ cropName: name, daysToMaturity, sowMethod }),
+              signal: AbortSignal.timeout(30_000),
+            });
+            if (res.ok) why = ((await res.json()) as { why: string | null }).why;
+          } catch {
+            why = null;
+          }
+          if (why) {
+            mutateCrops((list) => list.map((c) => (c.id === id ? { ...c, customWhy: why } : c)));
+          }
+          setGenerating((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+        })();
+      },
+
+      generatingWhy: generating,
 
       addCatalogCrop: (cropId) =>
         mutateCrops((list) => {
@@ -228,6 +265,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
               customName: null,
               customDaysToMaturity: null,
               customSowMethod: null,
+          customWhy: null,
               quantity: null,
               selected: true,
               addedAt: new Date().toISOString(),
@@ -256,7 +294,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       deleteLogEntry: (id) =>
         setState((prev) => ({ ...prev, log: prev.log.filter((e) => e.id !== id) })),
     };
-  }, [state, hydrated, mutateCrops, mutatePlan, pendingRecommendations]);
+  }, [state, hydrated, mutateCrops, mutatePlan, pendingRecommendations, generating]);
 
   return <PlanContext.Provider value={value}>{children}</PlanContext.Provider>;
 }

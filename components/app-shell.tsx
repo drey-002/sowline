@@ -42,10 +42,10 @@ export function AppShell({
   const year = plan?.year ?? planYearFor("04-22");
 
   return (
-    <div className="mx-auto w-full max-w-[1180px] md:px-6 md:py-8">
-      <div className="overflow-hidden border-border-strong bg-surface md:rounded-[6px] md:border">
+    <div className="print-frame mx-auto w-full max-w-[1180px] md:px-6 md:py-8">
+      <div className="print-frame overflow-hidden border-border-strong bg-surface md:rounded-[6px] md:border">
         {/* Desktop header */}
-        <header className="hidden items-center justify-between border-b border-line-light px-6 py-4 md:flex">
+        <header className="no-print hidden items-center justify-between border-b border-line-light px-6 py-4 md:flex">
           {/* The desktop design puts the descriptive heading in the content
               area, so the page's h1 is carried here for assistive tech only.
               Exactly one h1 is exposed at any width — the mobile header below
@@ -70,7 +70,7 @@ export function AppShell({
         {/* Mobile header collapses to a two-line block, with the step nav kept
             as a scrollable row beneath it — without it the phone layout has no
             way back to a finished step, only Continue. */}
-        <header className="border-b border-line-light md:hidden">
+        <header className="no-print border-b border-line-light md:hidden">
           <div className="px-4 pt-3">
             <p className="font-mono text-[11px] uppercase text-ink-muted-3">
               Step {current} of 5
@@ -156,7 +156,10 @@ export function ContextStrip({ resolving = false }: { resolving?: boolean }) {
         <strong className="font-semibold">Zone {location.hardinessZone}</strong> · frost {lastFrost}
         {!resolving && ` · ${days} days`}
       </span>
-      <Link href="/setup" className="text-accent underline underline-offset-2 hover:text-link-hover">
+      <Link
+        href="/setup"
+        className="no-print text-accent underline underline-offset-2 hover:text-link-hover"
+      >
         Edit
       </Link>
     </div>

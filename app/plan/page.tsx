@@ -26,9 +26,19 @@ export default function PlanPage() {
     <AppShell current={3} contextStrip={<ContextStrip />}>
       <div className="p-4 md:p-6">
         <h2 className="hidden text-[17px] font-semibold text-ink md:block">Planting plan</h2>
-        <p className="text-[13px] text-ink-body md:mt-1">
-          Timing, spacing and soil for each crop you selected, in sowing order.
-        </p>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <p className="text-[13px] text-ink-body md:mt-1">
+            Timing, spacing and soil for each crop you selected, in sowing order.
+          </p>
+          {selectedCrops.length > 0 && (
+            <button
+              onClick={() => window.print()}
+              className="no-print shrink-0 cursor-pointer rounded-[6px] border border-[#c8cec9] bg-surface px-4 py-[14px] text-[15px] font-semibold text-accent hover:border-accent md:rounded-[5px] md:px-[18px] md:py-[10px] md:text-[14px]"
+            >
+              Print plan
+            </button>
+          )}
+        </div>
 
         {selectedCrops.length === 0 || !location ? (
           <DashedPanel className="mt-5">
@@ -48,6 +58,7 @@ export default function PlanPage() {
               ))}
             </div>
             <StepActions
+              className="no-print"
               backHref="/crops"
               backLabel="Back to Crops"
               continueHref="/companions"
@@ -65,7 +76,7 @@ function PlanCard({ planCrop, location }: { planCrop: PlanCrop; location: Locati
   const name = crop ? `${crop.name}${crop.variety ? ` — '${crop.variety}'` : ""}` : planCrop.customName;
 
   return (
-    <div className="rounded-[8px] border border-line bg-surface p-4 md:rounded-[6px] md:px-[18px] md:py-4">
+    <div className="print-card rounded-[8px] border border-line bg-surface p-4 md:rounded-[6px] md:px-[18px] md:py-4">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-[6px]">
         <h3 className="text-[15px] font-semibold text-ink md:text-[16px]">{name}</h3>
         {crop?.descriptorTags.map((t) => <Tag key={t}>{t}</Tag>)}

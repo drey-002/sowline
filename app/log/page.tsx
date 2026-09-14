@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AppShell, ContextStrip } from "@/components/app-shell";
 import { Button, DashedPanel, Field, Panel, Select, TextInput } from "@/components/ui";
+import { StepActions } from "@/components/step-actions";
 import { CROPS_BY_ID } from "@/data/crops";
 import { formatMonthDay } from "@/lib/derive";
 import { usePlan } from "@/lib/plan-context";
@@ -84,6 +85,8 @@ export default function LogPage() {
             ))}
           </div>
         )}
+
+        <StepActions backHref="/companions" backLabel="Back to Companions" />
       </div>
     </AppShell>
   );

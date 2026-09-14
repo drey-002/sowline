@@ -2,6 +2,7 @@
 
 import { AppShell, ContextStrip } from "@/components/app-shell";
 import { ButtonLink, DashedPanel } from "@/components/ui";
+import { StepActions } from "@/components/step-actions";
 import { CROPS_BY_ID } from "@/data/crops";
 import { otherCropId, pairsForCrop } from "@/data/companions";
 import { usePlan } from "@/lib/plan-context";
@@ -46,11 +47,12 @@ export default function CompanionsPage() {
                   />
                 ))}
             </div>
-            <div className="mt-6">
-              <ButtonLink href="/log" className="w-full md:w-auto">
-                Continue to My Garden Log
-              </ButtonLink>
-            </div>
+            <StepActions
+              backHref="/plan"
+              backLabel="Back to Planting Plan"
+              continueHref="/log"
+              continueLabel="Continue to My Garden Log"
+            />
           </>
         )}
       </div>

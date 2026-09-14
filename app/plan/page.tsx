@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { AppShell, ContextStrip } from "@/components/app-shell";
 import { ButtonLink, DashedPanel, Tag } from "@/components/ui";
+import { StepActions } from "@/components/step-actions";
 import { CROPS_BY_ID } from "@/data/crops";
 import { bySowDate, formatMonthDay, sowDateLabel, sowMethodLabel } from "@/lib/derive";
 import { usePlan } from "@/lib/plan-context";
@@ -46,11 +47,12 @@ export default function PlanPage() {
                 <PlanCard key={pc.id} planCrop={pc} location={location} />
               ))}
             </div>
-            <div className="mt-6">
-              <ButtonLink href="/companions" className="w-full md:w-auto">
-                Continue to Companion Planting
-              </ButtonLink>
-            </div>
+            <StepActions
+              backHref="/crops"
+              backLabel="Back to Crops"
+              continueHref="/companions"
+              continueLabel="Continue to Companion Planting"
+            />
           </>
         )}
       </div>

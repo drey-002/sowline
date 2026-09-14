@@ -434,6 +434,11 @@ function SelectedRail({
             </ButtonLink>
           )}
         </div>
+        <div className="mt-3">
+          <ButtonLink href="/setup" variant="secondary" fullWidth>
+            ← Back to Zone &amp; Frost
+          </ButtonLink>
+        </div>
         {count > 0 && (
           <p className="mt-3 text-[12px] text-ink-muted-3">
             You can add or drop crops later without losing your plan.

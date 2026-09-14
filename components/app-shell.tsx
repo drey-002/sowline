@@ -57,6 +57,7 @@ export function AppShell({
               <Link
                 key={s.n}
                 href={s.href}
+                aria-current={s.n === current ? "step" : undefined}
                 className={`${stepTone(s.n, current, zoneSet)} hover:text-ink`}
               >
                 {s.n} · {s.label}
@@ -66,12 +67,32 @@ export function AppShell({
           </nav>
         </header>
 
-        {/* Mobile header collapses to a two-line block */}
-        <header className="border-b border-line-light px-4 py-3 md:hidden">
-          <p className="font-mono text-[11px] uppercase text-ink-muted-3">
-            Step {current} of 5
-          </p>
-          <h1 className="text-[17px] font-semibold text-ink">{step.mobileTitle}</h1>
+        {/* Mobile header collapses to a two-line block, with the step nav kept
+            as a scrollable row beneath it — without it the phone layout has no
+            way back to a finished step, only Continue. */}
+        <header className="border-b border-line-light md:hidden">
+          <div className="px-4 pt-3">
+            <p className="font-mono text-[11px] uppercase text-ink-muted-3">
+              Step {current} of 5
+            </p>
+            <h1 className="text-[17px] font-semibold text-ink">{step.mobileTitle}</h1>
+          </div>
+          <nav
+            aria-label="Planning steps"
+            className="mt-2 flex gap-4 overflow-x-auto px-4 pb-[10px] text-[12px]"
+          >
+            {STEPS.map((s) => (
+              <Link
+                key={s.n}
+                href={s.href}
+                aria-current={s.n === current ? "step" : undefined}
+                className={`shrink-0 whitespace-nowrap ${stepTone(s.n, current, zoneSet)}`}
+              >
+                {s.n} · {s.label}
+                {s.n < current && zoneSet ? " ✓" : ""}
+              </Link>
+            ))}
+          </nav>
         </header>
 
         {contextStrip}

@@ -75,7 +75,12 @@ export async function POST(request: Request) {
     const client = new Anthropic();
     const response = await client.messages.create({
       model: MODEL,
-      max_tokens: 200,
+      // Opus 5 runs adaptive thinking by default, so max_tokens has to cover
+      // the reasoning as well as the answer. A 200-token budget was consumed
+      // entirely by thinking and returned no text at all. Low effort suits a
+      // one-sentence task and keeps this to ~45 thinking tokens.
+      max_tokens: 2000,
+      output_config: { effort: "low" },
       system: SYSTEM,
       // The crop name is untrusted input, so it is fenced as data and the
       // system prompt above is the only source of instructions.
@@ -87,7 +92,8 @@ export async function POST(request: Request) {
       ],
     });
 
-    if (response.stop_reason === "refusal") {
+    if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens") {
+      console.error(`[enrich] no usable output: stop_reason=${response.stop_reason}`);
       return NextResponse.json({ why: null, reason: "failed" } satisfies EnrichResponse);
     }
 
@@ -99,10 +105,19 @@ export async function POST(request: Request) {
 
     // Guard against an empty or runaway response reaching the card.
     if (!text || text.length > 400) {
+      console.error(`[enrich] rejected output of length ${text.length}`);
       return NextResponse.json({ why: null, reason: "failed" } satisfies EnrichResponse);
     }
     return NextResponse.json({ why: text } satisfies EnrichResponse);
-  } catch {
+  } catch (error) {
+    // The client only ever sees why: null, so this is the sole record of what
+    // went wrong. Log the shape, never the request — the key lives in the
+    // client's headers and must not reach the logs.
+    const detail =
+      error instanceof Anthropic.APIError
+        ? `${error.constructor.name} status=${error.status} ${error.message}`
+        : String(error);
+    console.error("[enrich] generation failed:", detail);
     return NextResponse.json({ why: null, reason: "failed" } satisfies EnrichResponse);
   }
 }

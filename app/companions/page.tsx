@@ -16,7 +16,7 @@ export default function CompanionsPage() {
   );
 
   return (
-    <AppShell current={4} contextStrip={<ContextStrip />}>
+    <AppShell current={3} contextStrip={<ContextStrip />}>
       <div className="p-4 md:p-6">
         <h2 className="hidden text-[17px] font-semibold text-ink md:block">Companion planting</h2>
         <p className="text-[13px] text-ink-body md:mt-1">
@@ -48,10 +48,10 @@ export default function CompanionsPage() {
                 ))}
             </div>
             <StepActions
-              backHref="/plan"
-              backLabel="Back to Planting Plan"
-              continueHref="/log"
-              continueLabel="Continue to My Garden Log"
+              backHref="/crops"
+              backLabel="Back to Crops"
+              continueHref="/plan"
+              continueLabel="Continue to Planting Plan"
             />
           </>
         )}

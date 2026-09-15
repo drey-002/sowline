@@ -25,8 +25,8 @@ Five screens, in order, as a linear planning flow:
 
 1. **Zone & Frost Setup** — zip code entry, auto-resolved hardiness zone, auto-resolved last frost date with a hand-editable override.
 2. **Crop Recommendations (main screen)** — five recommended crops for the zone and frost date, with selection controls, per-crop quantity, and a custom crop add.
-3. **Planting Plan** — for each selected crop: timing, spacing, depth, soil mix, sun needs.
-4. **Companion Planting** — companion pairings limited to the crops the gardener actually selected.
+3. **Companion Planting** — companion pairings limited to the crops the gardener actually selected.
+4. **Planting Plan** — for each selected crop: timing, spacing, depth, soil mix, sun needs.
 5. **My Garden Log** — entries recording crop, location (container or ground), and sun exposure.
 
 Single user, no accounts. Data is per-browser. Desktop-first, works down to 390px.
@@ -54,8 +54,8 @@ Additional constraints:
 - **Routing:** App Router, one route per screen:
   - `/setup` → Zone & Frost Setup
   - `/crops` → Crop Recommendations (also the app's default landing route: `/` redirects to `/crops`, which redirects to `/setup` when no zone is set)
-  - `/plan` → Planting Plan
   - `/companions` → Companion Planting
+  - `/plan` → Planting Plan
   - `/log` → My Garden Log
 - **Crop data:** ships as a static seed file (`data/crops.ts`, `data/companions.ts`). The catalog itself is never fetched. Two route handlers were added in Phase 4 — `/api/zone` and `/api/enrich` — both optional, neither a content API for the catalog. There is still no backend database.
 
@@ -270,7 +270,7 @@ Single accent rule: green `#2f6b45` is the only accent. The blue container tag a
 
 **App shell (every screen).** A header bar (`16px 24px`, bottom border `#e6e6e1`) with the plan name "Season Plan 2027" on the left and a five-item step nav on the right at 13px: inactive `#73756e`, current `#1b1c1a` at 600, completed green `#2f6b45` with a `✓`. Steps read `1 · Zone`, `2 · Crops`, `3 · Plan`, `4 · Companions`, `5 · Log`. On mobile the header collapses to a two-line block: mono `STEP n OF 5` at 11px above a 17px/600 title, **followed by the same five-item step nav as a horizontally scrollable row**. Without it the phone layout had no way back to a finished step, only Continue — see §7. The screen title is the page's single `h1`: visible in the mobile header, `sr-only` on desktop, where the descriptive heading sits in the content area instead.
 
-Below the header on screens 2–5 sits a **context strip** (`12px 24px`) showing zone, frost dates, and frost-free days with an `Edit` link right-aligned. Populated: fill `#f2f7f3`, border-bottom `#dfe9e2`, text `#3c4a41`, `|` separators `#c9d6cd`. Not yet set: fill `#faf9f6`, border-bottom `#e6e6e1`, text `#71736d`, and the link reads `Set zone & frost date`.
+Below the header on screens 2–5 sits a **context strip** (`12px 24px`) showing zone, frost dates, and frost-free days with a `Start Over` action right-aligned. Start Over unticks every crop and returns to `/setup`; it confirms in place first (`Clear N crops?` / `Yes, start over` / `Cancel`) rather than opening a modal, and skips the question when nothing is selected. Crop rows are kept, only unticked, so a hand-typed custom crop survives and can be re-ticked on `/crops`. The garden log is untouched. Populated: fill `#f2f7f3`, border-bottom `#dfe9e2`, text `#3c4a41`, `|` separators `#c9d6cd`. Not yet set: fill `#faf9f6`, border-bottom `#e6e6e1`, text `#71736d`, and the link reads `Set zone & frost date`.
 
 ---
 
@@ -324,9 +324,9 @@ Tags, in card order: `HIGHEST YIELD / SQ FT` (green), then neutral descriptors (
 
 **These three screens have no approved wireframe.** They were built on the shell and vocabulary above (same header, same context strip, same card and field styling, same green accent) from the layouts below. No new component types were introduced.
 
-**Screen 3 — Planting Plan (`/plan`).** One card per selected crop **in sowing order, earliest first** — the page reads as a schedule rather than as the order crops happened to be ticked; custom crops carry no offset so they sort last, oldest first. Single column, `1180px`/`640px`-ish content, `12px` gaps. Card header: crop name (16px/600) plus its tags. Card body: a plain definition list in a two- or three-column grid at 13px — **Sow** (`direct sow Apr 29` / `transplant May 6`), **Days to maturity**, **Spacing** (`4 in apart, rows 18 in`), **Depth** (`1 in`), **Sun** (`full — 6+ hrs`), **Soil mix** (one sentence). Labels `#6a6c66`, values `#1b1c1a`. Empty state: dashed panel "No crops selected yet" + primary button back to `/crops`. No error state needed — all data is local. A `Print plan` secondary button sits beside the subtitle; see §5 Phase 4 for what printing drops.
+**Screen 3 — Companion Planting (`/companions`).** One card per selected crop. Inside each card two lists: **Plant with** (green check-free rows: companion crop name + reason, 13px) and **Keep apart from** (rows with the reason, ink `#8a3b2f` for the crop name only). Only pairs where **both** crops are in the plan, plus companions the gardener has not selected shown as a muted third list "Worth adding" with an `Add to plan` text button. Empty state: dashed panel pointing back to `/crops`.
 
-**Screen 4 — Companion Planting (`/companions`).** One card per selected crop. Inside each card two lists: **Plant with** (green check-free rows: companion crop name + reason, 13px) and **Keep apart from** (rows with the reason, ink `#8a3b2f` for the crop name only). Only pairs where **both** crops are in the plan, plus companions the gardener has not selected shown as a muted third list "Worth adding" with an `Add to plan` text button. Empty state: dashed panel pointing back to `/crops`.
+**Screen 4 — Planting Plan (`/plan`).** One card per selected crop **in sowing order, earliest first** — the page reads as a schedule rather than as the order crops happened to be ticked; custom crops carry no offset so they sort last, oldest first. Single column, `1180px`/`640px`-ish content, `12px` gaps. Card header: crop name (16px/600) plus its tags. Card body: a plain definition list in a two- or three-column grid at 13px — **Sow** (`direct sow Apr 29` / `transplant May 6`), **Days to maturity**, **Spacing** (`4 in apart, rows 18 in`), **Depth** (`1 in`), **Sun** (`full — 6+ hrs`), **Soil mix** (one sentence). Labels `#6a6c66`, values `#1b1c1a`. Empty state: dashed panel "No crops selected yet" + primary button back to `/crops`. No error state needed — all data is local. A `Print plan` secondary button sits beside the subtitle; see §5 Phase 4 for what printing drops.
 
 **Screen 5 — My Garden Log (`/log`).** A primary `+ Add log entry` button (full-width on mobile, below the subtitle), then a list of entries newest first — each row a card (`16px 18px`) with crop name (15px/600) on the left, and `container · 15 gal` / `ground · Bed 2` plus `full sun` as mono-free 13px meta, date right-aligned in `#73756e`. The add form is an inline panel (same panel styling as screen 1) with: crop `<select>` (selected plan crops + "Something else" → text input), location type radio (Container / In-ground), a detail text input, sun exposure `<select>` (Full / Partial / Shade), `<input type="date">`, and a one-line note. Each row carries `Edit` and `Delete` text buttons; Edit reopens the same inline panel pre-filled, retitled "Edit log entry" with a `Save changes` button, and updates in place. An entry whose crop has since left the plan falls back to "Something else" with the stored `cropName` preserved, so re-saving cannot blank it. Empty state: dashed panel "Nothing logged yet — log what you plant as you plant it."
 
@@ -382,7 +382,7 @@ boundaries, and the backward navigation described in §7.
 - Build screens 3, 4, and 5 per §4.4 against the real plan data.
 - Companion matching from `data/companions.ts`, restricted to selected crops, with the "Worth adding" list wired to add a crop to the plan.
 - Log entry create, edit, and delete; entries survive plan changes via the denormalized `cropName`.
-- Full-flow navigation: Continue moves forward, the context strip `Edit` link returns to `/setup` without losing the plan.
+- Full-flow navigation: Continue moves forward, and the context strip returns to `/setup` — as a non-destructive `Edit` link at the time, since Start Over replaced it later.
 
 **Verify in the browser**
 
@@ -400,7 +400,7 @@ boundaries, and the backward navigation described in §7.
   - The crop name is untrusted input: length-capped and fenced as data, with the system prompt as the only source of instructions.
   - **Companion `reason` text for custom crops was not built.** Custom crops do not participate in companion pairings at all, so there is nothing to caption.
   - Requires `ANTHROPIC_API_KEY` in `.env.local`; see `.env.example`. Absent it, the app behaves exactly as it did before Phase 4.
-- **Print export, done.** A `Print plan` button on `/plan` calls `window.print()`. An `@media print` block drops both headers, the step actions, the Print button itself and the context strip's `Edit` link, flattens the app frame, and marks each crop card `break-inside: avoid`. The strip's zone and frost figures are kept — they are worth having on paper. No PDF library.
+- **Print export, done.** A `Print plan` button on `/plan` calls `window.print()`. An `@media print` block drops both headers, the step actions, the Print button itself and the context strip's `Start Over` action, flattens the app frame, and marks each crop card `break-inside: avoid`. The strip's zone and frost figures are kept — they are worth having on paper. No PDF library.
 
 **Verify in the browser**
 
@@ -480,6 +480,32 @@ unrecoverable.
 The collapsed mobile header originally dropped the step nav, leaving the phone
 layout no way back to a finished step. The nav is now kept as a scrollable row,
 and every `Continue` is paired with a `Back`.
+
+### Companions moved ahead of the planting plan
+
+**Spec:** 1 Zone, 2 Crops, 3 Plan, 4 Companions, 5 Log.
+
+**Built:** 1 Zone, 2 Crops, **3 Companions, 4 Plan**, 5 Log. Routes are unchanged.
+
+**Why:** the companions screen carries an `Add to plan` button that changes the
+crop selection. Under the original order a gardener could add a companion on
+step 4 and leave the step-3 planting plan they had already read silently out of
+date. Reading the schedule last means it always reflects the final selection.
+
+### "Edit" became "Start Over"
+
+The context strip's `Edit` link was accurate but too quiet: it returned to step 1
+with everything preserved, so a gardener wanting a fresh start had no affordance
+for one. It is now `Start Over`, which unticks every crop and returns to
+`/setup`.
+
+It is the only destructive action in the app, so it confirms in place —
+`Clear N crops?` / `Yes, start over` / `Cancel` — using existing button styles
+rather than a modal, and skips the question entirely when nothing is selected.
+Crop rows are unticked rather than deleted, so a hand-typed custom crop and its
+generated why-line survive and can be re-ticked on `/crops`. The garden log is
+never touched: those are records of what was actually planted, and they are
+designed to outlive plan changes.
 
 ### Smaller decisions
 

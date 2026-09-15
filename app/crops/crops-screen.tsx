@@ -429,11 +429,11 @@ function SelectedRail({
         <div className="mt-5">
           {disabled || count === 0 ? (
             <Button fullWidth disabled>
-              Continue to Planting Plan
+              Continue to Companion Planting
             </Button>
           ) : (
-            <ButtonLink href="/plan" fullWidth>
-              Continue to Planting Plan
+            <ButtonLink href="/companions" fullWidth>
+              Continue to Companion Planting
             </ButtonLink>
           )}
         </div>
@@ -456,8 +456,8 @@ function SelectedRail({
             <span className="text-ink-body">{bedSpace} sq ft</span>
           </div>
           <div className="mt-3">
-            <ButtonLink href="/plan" fullWidth>
-              Continue to Planting Plan
+            <ButtonLink href="/companions" fullWidth>
+              Continue to Companion Planting
             </ButtonLink>
           </div>
         </div>

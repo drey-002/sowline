@@ -46,6 +46,8 @@ interface PlanContextValue {
   toggleCrop: (planCropId: string) => void;
   setQuantity: (planCropId: string, quantity: number | null) => void;
   removeCrop: (planCropId: string) => void;
+  /** Untick every crop, keeping the rows so nothing hand-typed is destroyed. */
+  clearSelections: () => void;
   addCustomCrop: (input: { name: string; daysToMaturity: number | null; sowMethod: PlanCrop["customSowMethod"] }) => void;
   /** Plan crops with a why-line generation in flight. */
   generatingWhy: ReadonlySet<string>;
@@ -200,6 +202,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         mutateCrops((list) =>
           list.map((c) => (c.id === planCropId ? { ...c, selected: false } : c)),
         ),
+
+      // Start Over unticks everything rather than deleting rows: a custom crop
+      // was typed by hand, and losing that is worse than losing a checkbox.
+      // Everything stays on /crops, recoverable by re-ticking.
+      clearSelections: () =>
+        mutateCrops((list) => list.map((c) => ({ ...c, selected: false }))),
 
       addCustomCrop: ({ name, daysToMaturity, sowMethod }) => {
         const id = newId();

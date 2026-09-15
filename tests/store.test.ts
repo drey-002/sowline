@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { emptyState, migrate } from "@/lib/store";
 import { isWellFormedZip } from "@/lib/lookup";
 

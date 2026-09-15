@@ -23,7 +23,7 @@ export default function PlanPage() {
   const ordered = useMemo(() => bySowDate(selectedCrops, CROPS_BY_ID), [selectedCrops]);
 
   return (
-    <AppShell current={3} contextStrip={<ContextStrip />}>
+    <AppShell current={4} contextStrip={<ContextStrip />}>
       <div className="p-4 md:p-6">
         <h2 className="hidden text-[17px] font-semibold text-ink md:block">Planting plan</h2>
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -59,10 +59,10 @@ export default function PlanPage() {
             </div>
             <StepActions
               className="no-print"
-              backHref="/crops"
-              backLabel="Back to Crops"
-              continueHref="/companions"
-              continueLabel="Continue to Companion Planting"
+              backHref="/companions"
+              backLabel="Back to Companions"
+              continueHref="/log"
+              continueLabel="Continue to My Garden Log"
             />
           </>
         )}

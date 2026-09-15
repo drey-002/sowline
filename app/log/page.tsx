@@ -86,7 +86,7 @@ export default function LogPage() {
           </div>
         )}
 
-        <StepActions backHref="/companions" backLabel="Back to Companions" />
+        <StepActions backHref="/plan" backLabel="Back to Planting Plan" />
       </div>
     </AppShell>
   );

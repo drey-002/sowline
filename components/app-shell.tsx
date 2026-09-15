@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useState, type ReactNode } from "react";
 import { usePlan } from "@/lib/plan-context";
 import { effectiveLastFrost, formatMonthDay, frostFreeDays, planYearFor } from "@/lib/derive";
 
 export const STEPS = [
   { n: 1, label: "Zone", href: "/setup", mobileTitle: "Zone & frost" },
   { n: 2, label: "Crops", href: "/crops", mobileTitle: "Crops" },
-  { n: 3, label: "Plan", href: "/plan", mobileTitle: "Planting plan" },
-  { n: 4, label: "Companions", href: "/companions", mobileTitle: "Companions" },
+  { n: 3, label: "Companions", href: "/companions", mobileTitle: "Companions" },
+  { n: 4, label: "Plan", href: "/plan", mobileTitle: "Planting plan" },
   { n: 5, label: "Log", href: "/log", mobileTitle: "Garden log" },
 ] as const;
 
@@ -156,12 +157,61 @@ export function ContextStrip({ resolving = false }: { resolving?: boolean }) {
         <strong className="font-semibold">Zone {location.hardinessZone}</strong> · frost {lastFrost}
         {!resolving && ` · ${days} days`}
       </span>
-      <Link
-        href="/setup"
-        className="no-print text-accent underline underline-offset-2 hover:text-link-hover"
-      >
-        Edit
-      </Link>
+      <StartOver />
     </div>
+  );
+}
+
+/**
+ * Replaces the old "Edit" link. Edit was accurate but too quiet: it preserved
+ * everything, so a gardener wanting a fresh start had no affordance for it.
+ * Start Over unticks every crop and returns to step 1.
+ *
+ * It is the only destructive action in the app, so it confirms in place —
+ * no modal, no new component type. With nothing selected there is nothing to
+ * lose, so it navigates straight away rather than asking a pointless question.
+ */
+function StartOver() {
+  const router = useRouter();
+  const { selectedCrops, clearSelections } = usePlan();
+  const [confirming, setConfirming] = useState(false);
+
+  const linkClass =
+    "cursor-pointer text-accent underline underline-offset-2 hover:text-link-hover";
+
+  if (!confirming) {
+    return (
+      <button
+        onClick={() => {
+          if (selectedCrops.length === 0) {
+            router.push("/setup");
+            return;
+          }
+          setConfirming(true);
+        }}
+        className={`no-print shrink-0 ${linkClass}`}
+      >
+        Start Over
+      </button>
+    );
+  }
+
+  return (
+    <span className="no-print flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1">
+      <span className="text-ink-body">Clear {selectedCrops.length} crops?</span>
+      <button
+        onClick={() => {
+          clearSelections();
+          setConfirming(false);
+          router.push("/setup");
+        }}
+        className={linkClass}
+      >
+        Yes, start over
+      </button>
+      <button onClick={() => setConfirming(false)} className={`${linkClass} text-ink-muted`}>
+        Cancel
+      </button>
+    </span>
   );
 }
